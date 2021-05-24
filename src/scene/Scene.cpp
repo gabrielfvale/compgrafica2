@@ -151,9 +151,10 @@ void Scene::print(GLubyte* pixels, int samples)
       {
         Intersection intersection;
         vector<Intersection> intersections;
-        
-        float colors[3] = {0.0f, 0.0f, 0.0f};
-        castRay(x, y, intersection);
+
+        castRay(x, y, intersection, 1.0f);
+        RGB intColor = intersection.color;
+        float colors[3] = {intColor.r, intColor.g, intColor.b};
 
         std::random_device rd;  //Will be used to obtain a seed for the random number engine
         std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
@@ -164,13 +165,13 @@ void Scene::print(GLubyte* pixels, int samples)
           int signal = k % 2 == 0 ? 1  : -1;
           Intersection newInt;
           castRay(x, y, newInt, offset * signal);
-          // cout << "Offset: " << offset << "\n";
           intersections.push_back(newInt);
           colors[0] += newInt.color.r;
           colors[1] += newInt.color.g;
           colors[2] += newInt.color.b;
         }
-        RGB final_color = RGB(colors[0]/samples, colors[1]/samples, colors[2]/samples);
+        int total = samples + 1;
+        RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
         set_pixel(pixels, x, y, final_color);
       }
     }

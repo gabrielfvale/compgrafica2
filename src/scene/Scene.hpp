@@ -27,8 +27,8 @@ class Scene
     vector<Object*> objects;
     Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Light*> lights, float w = 6, float d = 3);
     bool trace(Ray& ray, Intersection& intersection);
-    void castRay(int x, int y, Intersection& intersection);
-    void print(GLubyte* pixels);
+    void castRay(int x, int y, Intersection& intersection, float offset=1);
+    void print(GLubyte* pixels, int samples=1);
 };
 
 #endif

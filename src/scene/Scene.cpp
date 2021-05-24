@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 
+#include <random>
 #include <thread>
 #include <functional>
 #include <chrono>
@@ -55,7 +56,7 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
       p_int.get_z() + surfc_normal.get_z()
     );
 
-    // cast shadow rays for each light
+    // calculate color for each light
     for(unsigned i = 0; i < lights.size(); i++)
     {
       if(! *(lights[i]->active()) ) continue;
@@ -70,8 +71,8 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
 
       Vector3 lvp = lights[i]->get_position();
       Point light_point = lights[i]->type() == SPOT ? lights[i]->get_spotpos() : Point(lvp.get_x(), lvp.get_y(), lvp.get_z());
-
       int visible = 1;
+      /* Start of shadow code */
       unsigned k = 0;
       while(visible && k < objects.size())
       {
@@ -87,6 +88,7 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
         }
         k++;
       }
+      /* End of shadow code */
       intersection.color += intersection.solid_hit->calculate_color(lights[i], observer, p_int) * visible;
     }
     return true;
@@ -94,13 +96,13 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
   return false;
 }
 
-void Scene::castRay(int x, int y, Intersection& intersection)
+void Scene::castRay(int x, int y, Intersection& intersection, float offset)
 {
   float pixel_width = width/resolution;
   Point observer = *(camera->get_eye());
 
-  float x_pos = -width/2 + pixel_width/2 + x*pixel_width;
-  float y_pos = width/2 - pixel_width/2 - y*pixel_width;
+  float x_pos = -width/2 + ((pixel_width/2) * offset) + x*pixel_width;
+  float y_pos = width/2 - ((pixel_width/2) * offset) - y*pixel_width;
 
   Point hole_point = Point(x_pos, y_pos, -distance);
   hole_point = camera->camera_to_world() * hole_point;
@@ -119,7 +121,7 @@ void Scene::set_pixel(GLubyte* pixels, int x, int y, RGB rgb)
   pixels[position + 2] = std::floor(rgb.b * 255);
 }
 
-void Scene::print(GLubyte* pixels)
+void Scene::print(GLubyte* pixels, int samples)
 {
   cout << "[SCENE] Started rendering" << endl;
   chrono::time_point<chrono::system_clock> render_start, render_end;
@@ -139,8 +141,28 @@ void Scene::print(GLubyte* pixels)
       for (int x = 0; x < resolution; x++)
       {
         Intersection intersection;
+        vector<Intersection> intersections;
+        
+        float colors[3] = {0.0f, 0.0f, 0.0f};
         castRay(x, y, intersection);
-        set_pixel(pixels, x, y, intersection.color);
+
+        std::random_device rd;  //Will be used to obtain a seed for the random number engine
+        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+        std::uniform_real_distribution<> dis(0.0, 1.0);
+
+        for(int k = 0; k < samples; k++) {
+          float offset = dis(gen);
+          int signal = k % 2 == 0 ? 1  : -1;
+          Intersection newInt;
+          castRay(x, y, newInt, offset * signal);
+          // cout << "Offset: " << offset << "\n";
+          intersections.push_back(newInt);
+          colors[0] += newInt.color.r;
+          colors[1] += newInt.color.g;
+          colors[2] += newInt.color.b;
+        }
+        RGB final_color = RGB(colors[0]/samples, colors[1]/samples, colors[2]/samples);
+        set_pixel(pixels, x, y, final_color);
       }
     }
     },t*resolution/nthreads,(t+1)==nthreads?resolution:(t+1)*resolution/nthreads,t));

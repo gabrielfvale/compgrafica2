@@ -12,7 +12,7 @@
 
 using namespace std;
 
-Scene::Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Light*> lights, float w, float d)
+Scene::Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Light*> lights, bool shadow, float w, float d)
 {
   this->resolution = resolution;
   this->camera = camera;
@@ -20,6 +20,12 @@ Scene::Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Lig
   this->lights = lights;
   this->width = w;
   this->distance = d;
+  this->shadow = shadow;
+}
+
+void Scene::setShadow(bool value)
+{
+  this->shadow = value;
 }
 
 bool Scene::trace(Ray& ray, Intersection& intersection)
@@ -73,20 +79,23 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
       Point light_point = lights[i]->type() == SPOT ? lights[i]->get_spotpos() : Point(lvp.get_x(), lvp.get_y(), lvp.get_z());
       int visible = 1;
       /* Start of shadow code */
-      unsigned k = 0;
-      while(visible && k < objects.size())
+      if(shadow)
       {
-        if(objects[k]->trace(shadowray, obj_intersect))
+        unsigned k = 0;
+        while(visible && k < objects.size())
         {
-          visible = 0;
-          if(lights[i]->type() == POINT || lights[i]->type() == SPOT)
+          if(objects[k]->trace(shadowray, obj_intersect))
           {
-            Point shadow_point = shadowray.calc_point(obj_intersect.tint);
-            if(p_int.distance_from(&shadow_point) > p_int.distance_from(&light_point))
-              visible = 1; // light is closer to the object
+            visible = 0;
+            if(lights[i]->type() == POINT || lights[i]->type() == SPOT)
+            {
+              Point shadow_point = shadowray.calc_point(obj_intersect.tint);
+              if(p_int.distance_from(&shadow_point) > p_int.distance_from(&light_point))
+                visible = 1; // light is closer to the object
+            }
           }
+          k++;
         }
-        k++;
       }
       /* End of shadow code */
       intersection.color += intersection.solid_hit->calculate_color(lights[i], observer, p_int) * visible;

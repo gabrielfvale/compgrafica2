@@ -25,6 +25,7 @@ using namespace std;
 int resolution = 500;
 int samples = 1;
 float upscaling = 1.0f;
+bool has_shadow = true;
 GLubyte* PixelBuffer;
 
 /* Origin */
@@ -234,6 +235,11 @@ void display_gui()
     /* Samples */
     if(ImGui::BeginTabItem("Samples"))
     {
+      if(ImGui::Checkbox("Shadows", &has_shadow))
+      {
+        scene->setShadow(has_shadow);
+        redraw();
+      }
       ImGui::SliderInt("Samples", &samples, 1, 16);
       if(ImGui::Button("Update"))
       {

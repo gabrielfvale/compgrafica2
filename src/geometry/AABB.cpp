@@ -43,18 +43,19 @@ void AABB::set_params(Point* center, Vector3* n, float* edge)
 
 Vector3 AABB::surface_normal(Point& p_int)
 {
-  Point center = (min_bound + max_bound) * 0.5;
+  Point center = (max_bound + min_bound) * 0.5;
+  Point phit = p_int - center;
 
-  Vector3 center_p = Vector3(&center, &p_int);
   Point d = (min_bound - max_bound) * 0.5;
+  float bias = 1.0001f;
+
   Vector3 normal = Vector3(
-    center_p.get_x() / std::fabs(d.get_x()),
-    center_p.get_y() / std::fabs(d.get_y()),
-    center_p.get_z() / std::fabs(d.get_z())
+    (int)(phit.get_x() / abs(d.get_x()) * bias),
+    (int)(phit.get_y() / abs(d.get_y()) * bias),
+    (int)(phit.get_z() / abs(d.get_z()) * bias)
   );
-  normal = model_matrix * normal;
-  normal.normalize();
-  return normal;
+ normal.normalize();
+ return normal;
 }
 
 bool AABB::intersects(Ray& ray, float& t_min)

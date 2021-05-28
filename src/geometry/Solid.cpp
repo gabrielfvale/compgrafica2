@@ -77,3 +77,5 @@ RGB Solid::calculate_color(Light* light, Point& observer, Point& intersection)
   RGB Is = calculate_specular(light, observer, intersection);
   return Id + Is;
 }
+
+void Solid::set_polish(float polish) { this->polish = polish; }

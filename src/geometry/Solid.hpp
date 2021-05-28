@@ -22,6 +22,8 @@ class Solid
     Material* get_material();
     Vector3 light_direction(Light* light, Point& intersection);
     RGB calculate_color(Light* light, Point& observer, Point& intersection);
+    float polish = 0.0f;
+    void set_polish(float polish);
     virtual void uv(Point& p_int, float& u, float&v) = 0;
     virtual Vector3 surface_normal(Point& p_int) = 0;
     virtual bool intersects(Ray& ray, float& t_int) = 0;

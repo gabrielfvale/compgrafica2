@@ -120,7 +120,7 @@ bool Object::trace(Ray& ray, Intersection& intersection)
     {
       t_min = t_int;
       intersection.solid_hit = mesh_[i];
-      intersection.index = i;
+      // intersection.index = i;
       intersection.tint = t_int;
       hit = true;
     }

@@ -17,6 +17,7 @@ class Ray
     Point get_p0();
     Vector3 get_d();
     void set_params(Point* p0, Vector3* d);
+    Ray calc_reflection(Point p_int, Vector3 n);
 };
 
 #endif

@@ -15,6 +15,7 @@ class Intersection
     float tint;
     int index;
     RGB color;
+    Point p_int;
     Intersection()
     {
       object_hit = NULL;
@@ -22,6 +23,7 @@ class Intersection
       tint = 0;
       index = -1;
       color = RGB();
+      p_int = Point();
     }
 };
 

@@ -32,3 +32,11 @@ void Ray::set_params(Point* p0, Vector3* d)
   p0_ = *p0;
   d_ = *d;
 }
+Ray Ray::calc_reflection(Point p_int, Vector3 n)
+{
+  Vector3 v = d_;
+  Vector3 k = n * (-2*v.dot_product(&n));
+
+  Vector3 rd = k + v;
+  return Ray(p_int, rd);
+}

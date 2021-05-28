@@ -44,10 +44,10 @@ Camera* camera = new Camera(observerf3, lookatf3, viewupf3);
 /* Lights */
   /* Point lights */
 float pl_intensity[4][3] = {
-  {0.2f, 0.2f, 0.2f},
-  {0.2f, 0.2f, 0.2f},
-  {0.2f, 0.2f, 0.2f},
-  {0.2f, 0.2f, 0.2f}
+  {0.1f, 0.1f, 0.1f},
+  {0.1f, 0.1f, 0.1f},
+  {0.1f, 0.1f, 0.1f},
+  {0.1f, 0.1f, 0.1f}
 };
 float pl_pos[4][3] = {
   {100, 270, 90},
@@ -531,6 +531,7 @@ int main(int argc, char *argv[])
   Point floor_start = Point(back_wall_start.get_x(), -wall_thickness, 0);
   Point floor_end = Point(right_wall2_end.get_x(), 0, right_wall2_end.get_z());
   AABB* floor_rect = new AABB(floor_start, floor_end, mat_terrazo);
+  floor_rect->set_polish(0.05f);
   Object* floor = new Object(
     "Floor",
     OBB(floor_start, floor_end),
@@ -705,7 +706,7 @@ int main(int argc, char *argv[])
   Object* btg_bottle3 = btg_bottle2->clone();
   btg_bottle3->translate(Vector3(0, 0, -7.5));
 
-    /* Copo vermelho */
+  /* Copo vermelho */
   Object* red_cup = new Object(
     "Red cup",
     OBB(Point(-3, 0, -3), Point(3, 15, 3)),
@@ -720,7 +721,7 @@ int main(int argc, char *argv[])
   );
   red_cup->translate(Vector3(190, 118, 306));
 
-    /* Copo turquesa */
+  /* Copo turquesa */
   Object* turquoise_cup = new Object(
     "Turquoise cup",
     OBB(Point(-3.5, 0, -3.5), Point(3.5, 12, 3.5)),
@@ -884,9 +885,9 @@ int main(int argc, char *argv[])
   AABB* monitorBorderTop = new AABB(Point(-monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, -monitorScreenWidth/2),Point(monitorBorderWidth/2,monitorNeckHeight+2*monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2), mat_black_plastic);
   AABB* monitorBorderLeft = new AABB(Point(-monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth, -monitorScreenWidth/2),Point(monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, -monitorScreenWidth/2+monitorBorderWidth), mat_black_plastic);
   AABB* monitorBorderRight = new AABB(Point(-monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth, monitorScreenWidth/2),Point(monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2-monitorBorderWidth), mat_black_plastic);
-  AABB* monitorScreen = new AABB(Point(-0.5,monitorNeckHeight+monitorBorderWidth, -monitorScreenWidth/2),Point(monitorBorderWidth/2-0.5,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2-monitorBorderWidth), mat_white_lamp);
+  AABB* monitorScreen = new AABB(Point(-0.5,monitorNeckHeight+monitorBorderWidth, -monitorScreenWidth/2),Point(monitorBorderWidth/2-0.5,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2-monitorBorderWidth), mat_white_plastic);
   AABB* monitorBack = new AABB(Point(monitorBorderWidth/2-1,monitorNeckHeight+monitorBorderWidth, -monitorScreenWidth/2),Point(monitorBorderWidth/2,monitorNeckHeight+monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2-monitorBorderWidth),  mat_black_plastic);
-
+  
   Object* monitor = new Object(
     "Monitor",
     OBB(Point(-baseRadius,0, -monitorScreenWidth/2),Point(baseRadius,monitorNeckHeight+2*monitorBorderWidth+monitorScreenHeight, monitorScreenWidth/2)),
@@ -972,6 +973,22 @@ int main(int argc, char *argv[])
     }
   );
   sw_pc_table->translate(Vector3(215-60-15, 0, 30));
+
+
+  Sphere* gbase = new Sphere(
+    Point(0, 100, 180),
+    20,
+    mat_obsidian
+  );
+  gbase->set_polish(0.8f);
+  Object* globe = new Object(
+    "Globe",
+    OBB(Point(-20, 80, 160), Point(20, 140, 200)),
+    vector<Solid*>{gbase}
+  );
+  objects.push_back(globe);
+
+  objects.push_back(table);
 
 
   /* Paredes frontais */

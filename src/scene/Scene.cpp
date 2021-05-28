@@ -10,6 +10,8 @@
 #include <iostream>
 #include <iomanip>
 
+#define MAX_RAY_DEPTH 5
+
 using namespace std;
 
 Scene::Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Light*> lights, bool shadow, float w, float d)
@@ -28,11 +30,12 @@ void Scene::setShadow(bool value)
   this->shadow = value;
 }
 
-bool Scene::trace(Ray& ray, Intersection& intersection)
+RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
 {
   Point observer = *(camera->get_eye());
   float t_min = numeric_limits<float>::infinity();
 
+  RGB ret_color;
   Intersection obj_intersect;
   int object_index = -1;
 
@@ -44,6 +47,8 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
       intersection = obj_intersect;
       intersection.object_hit = objects[i];
       object_index = i;
+      intersection.index = object_index;
+      intersection.p_int = ray.calc_point(intersection.tint);
     }
   }
 
@@ -68,7 +73,7 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
       if(! *(lights[i]->active()) ) continue;
       if(lights[i]->type() == AMBIENT)
       {
-        intersection.color += intersection.solid_hit->calculate_color(lights[i], observer, p_int);
+        ret_color += intersection.solid_hit->calculate_color(lights[i], observer, p_int);
         continue;
       }
 
@@ -79,7 +84,7 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
       Point light_point = lights[i]->type() == SPOT ? lights[i]->get_spotpos() : Point(lvp.get_x(), lvp.get_y(), lvp.get_z());
       int visible = 1;
       /* Start of shadow code */
-      if(shadow)
+      if(shadow && depth == 0)
       {
         unsigned k = 0;
         while(visible && k < objects.size())
@@ -98,14 +103,25 @@ bool Scene::trace(Ray& ray, Intersection& intersection)
         }
       }
       /* End of shadow code */
-      intersection.color += intersection.solid_hit->calculate_color(lights[i], observer, p_int) * visible;
+      ret_color += intersection.solid_hit->calculate_color(lights[i], observer, p_int) * visible;
     }
-    return true;
+
+    if(intersection.solid_hit->polish > 0.0f && depth < MAX_RAY_DEPTH) {
+      Vector3 n = intersection.solid_hit->surface_normal(p_int);
+      Vector3 d = ray.get_d();
+      Ray reflectionRay = ray.calc_reflection(p_int, n);
+      Intersection reflection;
+      RGB newColor = trace(reflectionRay, reflection, depth + 1);
+      float shine = intersection.solid_hit->polish;
+      if (reflection.index != intersection.index)
+        ret_color += newColor * shine;
+    }
+
   }
-  return false;
+  return ret_color;
 }
 
-void Scene::castRay(int x, int y, Intersection& intersection, float offset)
+RGB Scene::castRay(int x, int y, Intersection& intersection, float offset)
 {
   float pixel_width = width/resolution;
   Point observer = *(camera->get_eye());
@@ -116,9 +132,9 @@ void Scene::castRay(int x, int y, Intersection& intersection, float offset)
   Point hole_point = Point(x_pos, y_pos, -distance);
   hole_point = camera->camera_to_world() * hole_point;
   Vector3 ray_direction = Vector3(&observer, &hole_point);
-  Ray ray = Ray(observer, ray_direction);
+  Ray ray = Ray(hole_point, ray_direction);
 
-  trace(ray, intersection);
+  return trace(ray, intersection);
 }
 
 void Scene::set_pixel(GLubyte* pixels, int x, int y, RGB rgb)
@@ -152,7 +168,8 @@ void Scene::print(GLubyte* pixels, int samples)
         Intersection intersection;
         vector<Intersection> intersections;
 
-        castRay(x, y, intersection, 1.0f);
+        RGB color = castRay(x, y, intersection, 1.0f);
+
         RGB intColor = intersection.color;
         float colors[3] = {intColor.r, intColor.g, intColor.b};
 
@@ -171,8 +188,8 @@ void Scene::print(GLubyte* pixels, int samples)
           colors[2] += newInt.color.b;
         }
         int total = samples + 1;
-        RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
-        set_pixel(pixels, x, y, final_color);
+        // RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
+        set_pixel(pixels, x, y, color);
       }
     }
     },t*resolution/nthreads,(t+1)==nthreads?resolution:(t+1)*resolution/nthreads,t));

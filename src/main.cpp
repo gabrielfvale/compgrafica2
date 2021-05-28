@@ -96,12 +96,16 @@ Material* mat_silver = new Material(
 	RGB(0.23125, 0.23125, 0.23125),
   RGB(0.2775, 0.2775, 0.2775),
   RGB(0.773911, 0.773911, 0.773911),
+  0.05f,
+  0.0f,
   89.6
 );
-Material* mat_obsidian = new Material(
-	RGB(0.05375, 0.05, 0.06625),
-  RGB(0.18275, 0.17, 0.22525),
-  RGB(0.332741, 0.328634, 0.346435),
+Material* mat_mirror = new Material(
+	RGB(0.0, 0.0, 0.0),
+  RGB(0.0, 0.0, 0.0),
+  RGB(0.0, 0.0, 0.0),
+  1.0f,
+  0.0f,
   38.4
 );
 Material* mat_white_concrete = new Material(
@@ -112,36 +116,55 @@ Material* mat_white_concrete = new Material(
 Material* mat_beige_paint = new Material(
   RGB(0.819607, 0.776470, 0.698039),
   RGB(0.882352, 0.839215, 0.760784),
-  RGB()
+  RGB(),
+  0.1f
 );
 Material* mat_terrazo = new Material(
   RGB(0.490196, 0.454901, 0.435294),
   RGB(0.57254, 0.53725, 0.51764),
   RGB(0.3, 0.3, 0.3),
+  0.025f,
+  0.0f,
   38.0
 );
 Material* mat_darkwood = new Material(
   RGB(0.149019, 0.090196, 0.062745),
   RGB(0.01, 0.01, 0.01),
   RGB(0.1, 0.1, 0.1),
+  0.0f,
+  0.0f,
   38.0
 );
 Material* mat_old_plastic = new Material(
   RGB(0.772549, 0.721568, 0.549019),
   RGB(0.949019, 0.898039, 0.760784),
   RGB(0.5, 0.5, 0.5),
+  0.0f,
+  0.0f,
   32
 );
 Material* mat_black_plastic = new Material(
   RGB(0, 0, 0),
   RGB(0.01, 0.01, 0.01),
   RGB(0.5, 0.5, 0.5),
+  0.0f,
+  0.0f,
   32
 );
 Material* mat_white_plastic = new Material(
   RGB(0.933333, 0.925490, 0.878431),
   RGB(0.976470, 0.968627, 0.921568),
   RGB(0.5, 0.5, 0.5),
+  0.1f,
+  0.0f,
+  32
+);
+Material* mat_transp_plastic = new Material(
+  RGB(0.0, 0.0, 0.0),
+  RGB(0.0, 0.0, 0.0),
+  RGB(0.0, 0.0, 0.0),
+  0.7f,
+  0.0f,
   32
 );
 Material* mat_white_lamp = new Material(
@@ -153,18 +176,24 @@ Material* mat_steel = new Material(
 	RGB(0.537354, 0.537354, 0.537354),
   RGB(0.772549, 0.772549, 0.772549),
   RGB(0.773911, 0.773911, 0.773911),
+  0.0f,
+  0.0f,
   32
 );
 Material* mat_marble = new Material(
   RGB(0.901960, 0.901960, 0.901960),
   RGB(0.949019, 0.949019, 0.949019),
   RGB(0.7, 0.7, 0.7),
+  0.05f,
+  0.0f,
   89.6
 );
 Material* mat_mdf = new Material(
   RGB(0.560784, 0.392156, 0.235294),
   RGB(0.901960, 0.811764, 0.662745),
   RGB(0.3, 0.3, 0.3),
+  0.2f,
+  0.0f,
   38
 );
 Material* mat_blue_chair = new Material(
@@ -187,6 +216,8 @@ Material* mat_table_sup = new Material(
 	RGB(0.537354, 0.537354, 0.537354),
   RGB(0.772549, 0.772549, 0.772549),
   RGB(0.773911, 0.773911, 0.773911),
+  0.1f,
+  0.0f,
   32
 );
 
@@ -531,7 +562,6 @@ int main(int argc, char *argv[])
   Point floor_start = Point(back_wall_start.get_x(), -wall_thickness, 0);
   Point floor_end = Point(right_wall2_end.get_x(), 0, right_wall2_end.get_z());
   AABB* floor_rect = new AABB(floor_start, floor_end, mat_terrazo);
-  floor_rect->set_polish(0.05f);
   Object* floor = new Object(
     "Floor",
     OBB(floor_start, floor_end),
@@ -691,12 +721,12 @@ int main(int argc, char *argv[])
     "BTG Bottle",
     OBB(Point(-3.5, 0, -3.5), Point(3.5, 22, 3.5)),
     vector<Solid*>{
-      new Cylinder(Point(), Vector3(), 18.5, 3, mat_white_plastic),
-      new Cylinder(Point(0, 8, 0), Vector3(), 10.5, 3.2, mat_white_plastic),
-      new Cylinder(Point(0, 10, 0), Vector3(), 8.5, 3.4, mat_white_plastic),
-      new Cylinder(Point(0, 12, 0), Vector3(), 6.5, 3.5, mat_white_plastic),
-      new Cylinder(Point(0, 14, 0), Vector3(), 4.5, 3.5, mat_white_plastic),
-      new Cylinder(Point(0, 18.5, 0), Vector3(), 0.5, 3, mat_white_plastic),
+      new Cylinder(Point(), Vector3(), 18.5, 3, mat_transp_plastic),
+      new Cylinder(Point(0, 8, 0), Vector3(), 10.5, 3.2, mat_transp_plastic),
+      new Cylinder(Point(0, 10, 0), Vector3(), 8.5, 3.4, mat_transp_plastic),
+      new Cylinder(Point(0, 12, 0), Vector3(), 6.5, 3.5, mat_transp_plastic),
+      new Cylinder(Point(0, 14, 0), Vector3(), 4.5, 3.5, mat_transp_plastic),
+      new Cylinder(Point(0, 18.5, 0), Vector3(), 0.5, 3, mat_transp_plastic),
       new Cylinder(Point(0, 19, 0), Vector3(), 3, 3, mat_blue_chair)
     }
   );
@@ -715,6 +745,8 @@ int main(int argc, char *argv[])
         RGB(0.4588, 0.1803, 0.1960),
         RGB(0.6117, 0.1686, 0.2470),
         RGB(0.5, 0.5, 0.5),
+        0.025f,
+        0.0f,
         32
       ))
     }
@@ -897,27 +929,6 @@ int main(int argc, char *argv[])
   Object* monitor2 = monitor->clone();
   monitor2->translate(Vector3(0, 0, 80.5));
 
-  /* Teclados */
-  AABB* tecladoBase = new AABB(Point(-6.0f,0.0f,-21.5f), Point(6.0f,2.0f,21.5f), mat_white_plastic);
-  AABB* tecladoTecla1 = new AABB(Point(5.5f,2.0f,-20.5f), Point(4.5f,2.5f,-19.5f), mat_old_plastic);
-  AABB* tecladoTecla2= new AABB(Point(5.5f,2.0f,-18.5f), Point(4.5f,2.5f,5.0f), mat_old_plastic);
-  AABB* tecladoTecla3= new AABB(Point(5.5f,2.0f, 6.0f), Point(0.0f,2.5f, 11.5f), mat_old_plastic);
-  AABB* tecladoTecla4= new AABB(Point(-5.5,2.0f, -20.5), Point(3.5,2.5f, 5.0f), mat_old_plastic);
-  AABB* tecladoTecla5= new AABB(Point(-5.5,2.0f, 6.0f), Point(-4.0f,2.5f, 11.0f), mat_old_plastic);
-  AABB* tecladoTecla6= new AABB(Point(-4.0,2.0f, 7.6f), Point(-2.5f,2.5f, 9.2f), mat_old_plastic);
-  AABB* tecladoTecla7= new AABB(Point(-5.5f,2.0f, 12.5f), Point(3.5f,2.5f, 20.5f), mat_old_plastic);
-
-  Object* teclado = new Object(
-    "Teclado",
-    OBB(Point(-6.0f,0.0f,-21.5f), Point(6.0f,2.5f,21.5f)),
-    vector<Solid*>{tecladoBase, tecladoTecla1, tecladoTecla2, tecladoTecla3, tecladoTecla4, tecladoTecla5, tecladoTecla6, tecladoTecla7}
-  );
-
-  teclado->translate(Vector3(215-52.5, 75, 100.5));
-  Object* teclado2 = teclado->clone();
-  teclado2->translate(Vector3(0, 0, 80.5));
-  teclado2->rotate(5 * (M_PI/180), Vector3(0, 1, 0));
-
   float pct_h = 75;
   Object* pc_table = new Object(
     "PC Table",
@@ -978,9 +989,8 @@ int main(int argc, char *argv[])
   Sphere* gbase = new Sphere(
     Point(0, 100, 180),
     20,
-    mat_obsidian
+    mat_mirror
   );
-  gbase->set_polish(0.8f);
   Object* globe = new Object(
     "Globe",
     OBB(Point(-20, 80, 160), Point(20, 140, 200)),
@@ -1003,11 +1013,9 @@ int main(int argc, char *argv[])
   objects.push_back(sw_pc_table);
   objects.push_back(pc_table);
   objects.push_back(pc_table2);
-  /* Monitores e Teclados */
+  /* Monitores */
   objects.push_back(monitor);
   objects.push_back(monitor2);
-  objects.push_back(teclado);
-  objects.push_back(teclado2);
   /* Objetos em cima do armário */
   objects.push_back(pic_frame);
   objects.push_back(btg_bottle);

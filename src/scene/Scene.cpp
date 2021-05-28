@@ -10,7 +10,7 @@
 #include <iostream>
 #include <iomanip>
 
-#define MAX_RAY_DEPTH 5
+#define MAX_RAY_DEPTH 4
 
 using namespace std;
 
@@ -106,15 +106,25 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
       ret_color += intersection.solid_hit->calculate_color(lights[i], observer, p_int) * visible;
     }
 
-    if(intersection.solid_hit->polish > 0.0f && depth < MAX_RAY_DEPTH) {
+    Material* solid_mat = intersection.solid_hit->get_material();
+    if(solid_mat->polish > 0.0f && depth < MAX_RAY_DEPTH) {
+      
       Vector3 n = intersection.solid_hit->surface_normal(p_int);
-      Vector3 d = ray.get_d();
       Ray reflectionRay = ray.calc_reflection(p_int, n);
       Intersection reflection;
       RGB newColor = trace(reflectionRay, reflection, depth + 1);
-      float shine = intersection.solid_hit->polish;
+      float shine = solid_mat->polish;
       if (reflection.index != intersection.index)
         ret_color += newColor * shine;
+    }
+    if(solid_mat->refraction > 0.0f && depth < MAX_RAY_DEPTH) {
+      Vector3 n = intersection.solid_hit->surface_normal(p_int);
+      Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction);
+      Intersection refraction;
+      RGB newColor = trace(refractionRay, refraction, depth + 1);
+      float shine = 1.0f;
+      // if (refractionRay.get_d().norm() > 0.0f)
+      ret_color += newColor * shine;
     }
 
   }
@@ -169,9 +179,7 @@ void Scene::print(GLubyte* pixels, int samples)
         vector<Intersection> intersections;
 
         RGB color = castRay(x, y, intersection, 1.0f);
-
-        RGB intColor = intersection.color;
-        float colors[3] = {intColor.r, intColor.g, intColor.b};
+        float colors[3] = {color.r, color.g, color.b};
 
         std::random_device rd;  //Will be used to obtain a seed for the random number engine
         std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
@@ -181,14 +189,14 @@ void Scene::print(GLubyte* pixels, int samples)
           float offset = dis(gen);
           int signal = k % 2 == 0 ? 1  : -1;
           Intersection newInt;
-          castRay(x, y, newInt, offset * signal);
+          RGB newColor = castRay(x, y, newInt, offset * signal);
           intersections.push_back(newInt);
-          colors[0] += newInt.color.r;
-          colors[1] += newInt.color.g;
-          colors[2] += newInt.color.b;
+          colors[0] += newColor.r;
+          colors[1] += newColor.g;
+          colors[2] += newColor.b;
         }
         int total = samples + 1;
-        // RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
+        RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
         set_pixel(pixels, x, y, color);
       }
     }

@@ -40,3 +40,22 @@ Ray Ray::calc_reflection(Point p_int, Vector3 n)
   Vector3 rd = k + v;
   return Ray(p_int, rd);
 }
+Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior)
+{
+  Vector3 I = d_ * -1;
+  float cosi = I.dot_product(&n);
+  float eta_i = 1.0f, eta_t = ior;
+  Vector3 n_rf = n;
+  if (cosi < 0) {
+    cosi = -cosi;
+  } else {
+    std::swap(eta_i, eta_t);
+    n_rf = n * -1;
+  }
+  float eta = eta_t / eta_i;
+  float k = 1 - eta * eta * (1 - cosi * cosi);
+  Vector3 f1 = I * eta;
+  Vector3 f2 = n_rf * (eta * cosi - sqrtf(k));
+  Vector3 dir = k < 0 ? Vector3() : f1 + f2;
+  return Ray(p_int, dir);
+}

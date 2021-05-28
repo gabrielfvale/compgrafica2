@@ -7,19 +7,23 @@ Material::Material()
   specular = RGB();
   shine = 0;
 }
-Material::Material(RGB ambient, RGB diffuse, RGB specular, float shine)
+Material::Material(RGB ambient, RGB diffuse, RGB specular, float polish, float refraction, float shine)
 {
   this->ambient = ambient;
   this->diffuse = diffuse;
   this->specular = specular;
+  this->polish = polish;
+  this->refraction = refraction;
   this->shine = shine;
 }
-Material::Material(RGB ambient, RGB specular, Texture* texture, float shine)
+Material::Material(RGB ambient, RGB specular, Texture* texture, float polish, float refraction, float shine)
 {
   this->ambient = ambient;
   this->diffuse = RGB();
   this->specular = specular;
   this->texture = texture;
+  this->polish = polish;
+  this->refraction = refraction;
   this->shine = shine;
 }
 
@@ -41,6 +45,9 @@ void Material::set_specular(float* rgb)
   this->specular.g = rgb[1];
   this->specular.b = rgb[0];
 }
+
+void Material::set_polish(float p) { polish = p; }
+void Material::set_refraction(float r) { refraction = r; }
 void Material::set_shine(float s) { shine = s; }
 
 RGB Material::lambertian(float u, float v, Point& p_int)

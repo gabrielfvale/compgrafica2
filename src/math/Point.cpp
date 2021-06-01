@@ -48,6 +48,16 @@ Point Point::operator-(Point& p2)
   return Point(x_ - p2.get_x(), y_ - p2.get_y(), z_ - p2.get_z());
 }
 
+Point Point::operator+(float value)
+{ 
+  return Point(x_ + value, y_ + value, z_ + value);
+}
+
+Point Point::operator-(float value)
+{ 
+  return Point(x_ - value, y_ - value, z_ - value);
+}
+
 Point Point::operator*(float value)
 { 
   return Point(x_ * value, y_ * value, z_ * value);

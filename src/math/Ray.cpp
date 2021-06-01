@@ -65,3 +65,25 @@ Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior, bool& has_refr)
   }
   return Ray(p_int, dir); 
 }
+
+void Ray::fresnel(Vector3& I, Vector3& N, float& ior, float& kr)
+{
+  float cosi = I.dot_product(&N);
+  if (cosi < -1) cosi = -1; 
+  if (cosi > 1) cosi = 1; 
+
+  float etai = 1.0f, etat = ior;
+  if (cosi > 0) std::swap(etai, etat);
+
+  float sint = etai / etat * sqrtf(std::max(0.0f, 1 - cosi * cosi));
+
+  if (sint >= 1) {
+    kr = 1;
+  } else {
+    float cost = sqrtf(std::max(0.0f, 1 - sint * sint));
+    cosi = fabsf(cosi);
+    float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost)); 
+    float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+    kr = (Rs * Rs + Rp * Rp) / 2;
+  }
+}

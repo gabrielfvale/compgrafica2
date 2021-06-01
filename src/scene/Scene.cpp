@@ -56,7 +56,7 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
   {
     float episilon = 0.01;
     intersection.color = RGB();
-    Point p_int = ray.calc_point(intersection.tint);
+    Point p_int = intersection.p_int;
     Vector3 surfc_normal = intersection.solid_hit->surface_normal(p_int);
     surfc_normal = surfc_normal * episilon;
 
@@ -117,21 +117,33 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
         Vector3 n = intersection.solid_hit->surface_normal(p_int);
         Ray reflection_ray = ray.calc_reflection(p_int, n);
         Intersection reflection_int;
-        RGB newColor = trace(reflection_ray, reflection_int, depth + 1);
-        ret_color += newColor * solid_mat->polish;
+        RGB reflection_color = trace(reflection_ray, reflection_int, depth + 1);
+        ret_color += reflection_color * solid_mat->polish;
       }
       break;
     case REFLECTIVE_AND_REFRACTIVE:
       if(depth < MAX_RAY_DEPTH) {
+        float kr;
+        RGB refraction_color;
+        Vector3 I = ray.get_d();
         Vector3 n = intersection.solid_hit->surface_normal(p_int);
-        bool has_refr;
-        Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
-        float transmittance = 0.8f;
-        if (has_refr) {
+        ray.fresnel(I, n, solid_mat->refraction, kr);
+
+        // calculate refraction if not total internal reflection
+        if (kr < 1) {
+          bool has_refr;
+          Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
           Intersection refraction;
-          RGB newColor = trace(refractionRay, refraction, depth + 1, intersection.index);
-          ret_color += newColor * transmittance;
+          refraction_color = trace(refractionRay, refraction, depth + 1, intersection.index);
         }
+        // calculate reflection
+        Ray reflection_ray = ray.calc_reflection(p_int, n);
+        Intersection reflection_int;
+        RGB reflection_color = trace(reflection_ray, reflection_int, depth + 1);
+        // mix
+        float kf = (1 - kr);
+        ret_color += reflection_color * kr * solid_mat->polish;
+        ret_color += refraction_color * kf * solid_mat->transmittance;
       }
       break;
     default:

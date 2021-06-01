@@ -15,7 +15,8 @@ Material::Material(RGB ambient, RGB diffuse, RGB specular, std::vector<float> pr
 
   this->polish = properties[0];
   this->refraction = properties[1];
-  this->shine = properties[2];
+  this->transmittance = properties[2];
+  this->shine = properties[3];
   this->type = type;
 }
 Material::Material(RGB ambient, RGB specular, Texture* texture, std::vector<float> properties, MatType type)
@@ -26,7 +27,8 @@ Material::Material(RGB ambient, RGB specular, Texture* texture, std::vector<floa
   this->texture = texture;
   this->polish = properties[0];
   this->refraction = properties[1];
-  this->shine = properties[2];
+  this->transmittance = properties[2];
+  this->shine = properties[3];
   this->type = type;
 }
 

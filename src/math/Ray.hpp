@@ -19,6 +19,7 @@ class Ray
     void set_params(Point* p0, Vector3* d);
     Ray calc_reflection(Point p_int, Vector3 n);
     Ray calc_refraction(Point p_int, Vector3 n, float ior, bool& has_refr);
+    void fresnel(Vector3& I, Vector3& N, float& ior, float& kr);
 };
 
 #endif

@@ -1,0 +1,3 @@
+#pragma once
+
+enum MatType { DIFFUSE, REFLECTIVE, REFLECTIVE_AND_REFRACTIVE };

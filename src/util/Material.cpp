@@ -7,24 +7,27 @@ Material::Material()
   specular = RGB();
   shine = 0;
 }
-Material::Material(RGB ambient, RGB diffuse, RGB specular, float polish, float refraction, float shine)
+Material::Material(RGB ambient, RGB diffuse, RGB specular, std::vector<float> properties, MatType type)
 {
   this->ambient = ambient;
   this->diffuse = diffuse;
   this->specular = specular;
-  this->polish = polish;
-  this->refraction = refraction;
-  this->shine = shine;
+
+  this->polish = properties[0];
+  this->refraction = properties[1];
+  this->shine = properties[2];
+  this->type = type;
 }
-Material::Material(RGB ambient, RGB specular, Texture* texture, float polish, float refraction, float shine)
+Material::Material(RGB ambient, RGB specular, Texture* texture, std::vector<float> properties, MatType type)
 {
   this->ambient = ambient;
   this->diffuse = RGB();
   this->specular = specular;
   this->texture = texture;
-  this->polish = polish;
-  this->refraction = refraction;
-  this->shine = shine;
+  this->polish = properties[0];
+  this->refraction = properties[1];
+  this->shine = properties[2];
+  this->type = type;
 }
 
 void Material::set_ambient(float* rgb)

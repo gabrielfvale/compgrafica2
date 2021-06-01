@@ -41,7 +41,7 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
 
   for(unsigned i = 0; i < objects.size(); i++)
   {
-    if(i != skip && objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
+    if((int)i != skip && objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
     {
       t_min = obj_intersect.tint;
       intersection = obj_intersect;
@@ -107,29 +107,36 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
     }
 
     Material* solid_mat = intersection.solid_hit->get_material();
-    if(solid_mat->polish > 0.0f && depth < MAX_RAY_DEPTH) {
-      
-      Vector3 n = intersection.solid_hit->surface_normal(p_int);
-      Ray reflectionRay = ray.calc_reflection(p_int, n);
-      Intersection reflection;
-      RGB newColor = trace(reflectionRay, reflection, depth + 1);
-      float shine = solid_mat->polish;
-      ret_color += newColor * shine;
-    }
-
-    if(solid_mat->refraction > 0.0f && depth < MAX_RAY_DEPTH) {
-      Vector3 n = intersection.solid_hit->surface_normal(p_int);
-      bool has_refr;
-      Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
-      float transmittance = 1.0f;
-      if (has_refr) {
-        Intersection refraction;
-        RGB newColor = trace(refractionRay, refraction, depth + 1, intersection.index);
-        ret_color += newColor * transmittance;
+    MatType mat_type = solid_mat->type;
+    switch (mat_type)
+    {
+    case DIFFUSE:
+      break;
+    case REFLECTIVE:
+      if(depth < MAX_RAY_DEPTH) {
+        Vector3 n = intersection.solid_hit->surface_normal(p_int);
+        Ray reflection_ray = ray.calc_reflection(p_int, n);
+        Intersection reflection_int;
+        RGB newColor = trace(reflection_ray, reflection_int, depth + 1);
+        ret_color += newColor * solid_mat->polish;
       }
-        
+      break;
+    case REFLECTIVE_AND_REFRACTIVE:
+      if(depth < MAX_RAY_DEPTH) {
+        Vector3 n = intersection.solid_hit->surface_normal(p_int);
+        bool has_refr;
+        Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
+        float transmittance = 0.8f;
+        if (has_refr) {
+          Intersection refraction;
+          RGB newColor = trace(refractionRay, refraction, depth + 1, intersection.index);
+          ret_color += newColor * transmittance;
+        }
+      }
+      break;
+    default:
+      break;
     }
-
   }
   return ret_color;
 }

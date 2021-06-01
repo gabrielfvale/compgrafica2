@@ -96,17 +96,15 @@ Material* mat_silver = new Material(
 	RGB(0.23125, 0.23125, 0.23125),
   RGB(0.2775, 0.2775, 0.2775),
   RGB(0.773911, 0.773911, 0.773911),
-  0.05f,
-  0.0f,
-  89.6
+  {0.05f, 0.0f, 89.6},
+  REFLECTIVE
 );
 Material* mat_mirror = new Material(
 	RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
-  1.0f,
-  0.0f,
-  38.4
+  {1.0f, 0.0f, 38.4},
+  REFLECTIVE
 );
 Material* mat_white_concrete = new Material(
   RGB(0.847058, 0.819607, 0.756862),
@@ -117,55 +115,47 @@ Material* mat_beige_paint = new Material(
   RGB(0.819607, 0.776470, 0.698039),
   RGB(0.882352, 0.839215, 0.760784),
   RGB(),
-  0.1f
+  {0.1f, 0.0f, 0.0f},
+  REFLECTIVE
 );
 Material* mat_terrazo = new Material(
   RGB(0.490196, 0.454901, 0.435294),
   RGB(0.57254, 0.53725, 0.51764),
   RGB(0.3, 0.3, 0.3),
-  0.025f,
-  0.0f,
-  38.0
+  {0.025f, 0.0f, 38.0},
+  REFLECTIVE
 );
 Material* mat_darkwood = new Material(
   RGB(0.149019, 0.090196, 0.062745),
   RGB(0.01, 0.01, 0.01),
   RGB(0.1, 0.1, 0.1),
-  0.0f,
-  0.0f,
-  38.0
+  {0.0f, 0.0f, 38.0}
 );
 Material* mat_old_plastic = new Material(
   RGB(0.772549, 0.721568, 0.549019),
   RGB(0.949019, 0.898039, 0.760784),
   RGB(0.5, 0.5, 0.5),
-  0.0f,
-  0.0f,
-  32
+  {0.1f, 0.0f, 32},
+  REFLECTIVE
 );
 Material* mat_black_plastic = new Material(
   RGB(0, 0, 0),
   RGB(0.01, 0.01, 0.01),
   RGB(0.5, 0.5, 0.5),
-  0.0f,
-  0.0f,
-  32
+  {0.0f, 0.0f, 32}
 );
 Material* mat_white_plastic = new Material(
   RGB(0.933333, 0.925490, 0.878431),
   RGB(0.976470, 0.968627, 0.921568),
   RGB(0.5, 0.5, 0.5),
-  0.1f,
-  0.0f,
-  32
+  {0.1f, 0.0f, 32}
 );
 Material* mat_transp_plastic = new Material(
   RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
-  0.0f,
-  1.53f,
-  32
+  {0.2f, 1.53f, 32},
+  REFLECTIVE_AND_REFRACTIVE
 );
 Material* mat_white_lamp = new Material(
   RGB(1, 1, 1),
@@ -176,25 +166,21 @@ Material* mat_steel = new Material(
 	RGB(0.537354, 0.537354, 0.537354),
   RGB(0.772549, 0.772549, 0.772549),
   RGB(0.773911, 0.773911, 0.773911),
-  0.0f,
-  0.0f,
-  32
+  {0.0f, 0.0f, 32}
 );
 Material* mat_marble = new Material(
   RGB(0.901960, 0.901960, 0.901960),
   RGB(0.949019, 0.949019, 0.949019),
   RGB(0.7, 0.7, 0.7),
-  0.05f,
-  0.0f,
-  89.6
+  {0.05f, 0.0f, 89.6},
+  REFLECTIVE
 );
 Material* mat_mdf = new Material(
   RGB(0.560784, 0.392156, 0.235294),
   RGB(0.901960, 0.811764, 0.662745),
   RGB(0.3, 0.3, 0.3),
-  0.2f,
-  0.0f,
-  38
+  {0.2f, 0.0f, 38},
+  REFLECTIVE
 );
 Material* mat_blue_chair = new Material(
   RGB(0.1921, 0.2588, 0.4274),
@@ -216,9 +202,8 @@ Material* mat_table_sup = new Material(
 	RGB(0.537354, 0.537354, 0.537354),
   RGB(0.772549, 0.772549, 0.772549),
   RGB(0.773911, 0.773911, 0.773911),
-  0.1f,
-  0.0f,
-  32
+  {0.1f, 0.0f, 32},
+  REFLECTIVE
 );
 
 float obj_ambient[3] = {0.0f, 0.0f, 0.0f};
@@ -745,9 +730,8 @@ int main(int argc, char *argv[])
         RGB(0.4588, 0.1803, 0.1960),
         RGB(0.6117, 0.1686, 0.2470),
         RGB(0.5, 0.5, 0.5),
-        0.025f,
-        0.0f,
-        32
+        {0.025f, 0.0f, 32},
+        REFLECTIVE
       ))
     }
   );

@@ -40,22 +40,28 @@ Ray Ray::calc_reflection(Point p_int, Vector3 n)
   Vector3 rd = k + v;
   return Ray(p_int, rd);
 }
-Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior)
+Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior, bool& has_refr)
 {
-  Vector3 I = d_ * -1;
-  float cosi = I.dot_product(&n);
-  float eta_i = 1.0f, eta_t = ior;
-  Vector3 n_rf = n;
-  if (cosi < 0) {
-    cosi = -cosi;
-  } else {
-    std::swap(eta_i, eta_t);
-    n_rf = n * -1;
-  }
-  float eta = eta_t / eta_i;
+  has_refr = false;
+  Vector3 I = d_;
+  Vector3 N = n;
+
+  float cosi = I.dot_product(&N);
+
+  if (cosi < -1) cosi = -1; 
+  if (cosi > 1) cosi = 1; 
+
+  float etai = 1, etat = ior; 
+
+  if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); N= N * -1; } 
+  float eta = etai / etat;
   float k = 1 - eta * eta * (1 - cosi * cosi);
-  Vector3 f1 = I * eta;
-  Vector3 f2 = n_rf * (eta * cosi - sqrtf(k));
-  Vector3 dir = k < 0 ? Vector3() : f1 + f2;
-  return Ray(p_int, dir);
+  Vector3 t1 = (I * eta);
+  Vector3 t2 = N * (eta * cosi - sqrtf(k));
+  Vector3 dir;
+  if (k >= 0) {
+    dir = t1 + t2;
+    has_refr = true;
+  }
+  return Ray(p_int, dir); 
 }

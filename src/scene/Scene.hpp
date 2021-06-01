@@ -28,7 +28,7 @@ class Scene
     vector<Object*> objects;
     Scene(int resolution, Camera* camera, vector<Object*> objects, vector<Light*> lights, bool shadow = true, float w = 6, float d = 3);
     void setShadow(bool value);
-    RGB trace(Ray& ray, Intersection& intersection, int depth=0);
+    RGB trace(Ray& ray, Intersection& intersection, int depth=0, int skip=-1);
     RGB castRay(int x, int y, Intersection& intersection, float offset=1);
     void print(GLubyte* pixels, int samples=1);
 };

@@ -30,7 +30,7 @@ void Scene::setShadow(bool value)
   this->shadow = value;
 }
 
-RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
+RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
 {
   Point observer = *(camera->get_eye());
   float t_min = numeric_limits<float>::infinity();
@@ -41,7 +41,7 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
 
   for(unsigned i = 0; i < objects.size(); i++)
   {
-    if(objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
+    if(i != skip && objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
     {
       t_min = obj_intersect.tint;
       intersection = obj_intersect;
@@ -114,17 +114,20 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
       Intersection reflection;
       RGB newColor = trace(reflectionRay, reflection, depth + 1);
       float shine = solid_mat->polish;
-      if (reflection.index != intersection.index)
-        ret_color += newColor * shine;
+      ret_color += newColor * shine;
     }
+
     if(solid_mat->refraction > 0.0f && depth < MAX_RAY_DEPTH) {
       Vector3 n = intersection.solid_hit->surface_normal(p_int);
-      Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction);
-      Intersection refraction;
-      RGB newColor = trace(refractionRay, refraction, depth + 1);
-      float shine = 1.0f;
-      // if (refractionRay.get_d().norm() > 0.0f)
-      ret_color += newColor * shine;
+      bool has_refr;
+      Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
+      float transmittance = 1.0f;
+      if (has_refr) {
+        Intersection refraction;
+        RGB newColor = trace(refractionRay, refraction, depth + 1, intersection.index);
+        ret_color += newColor * transmittance;
+      }
+        
     }
 
   }

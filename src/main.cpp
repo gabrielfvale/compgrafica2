@@ -163,8 +163,8 @@ Material* mat_transp_plastic = new Material(
   RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
-  0.7f,
   0.0f,
+  1.53f,
   32
 );
 Material* mat_white_lamp = new Material(
@@ -997,6 +997,16 @@ int main(int argc, char *argv[])
     vector<Solid*>{gbase}
   );
   objects.push_back(globe);
+
+  Object* panel = new Object(
+    "Panel",
+    OBB(Point(-20, 80, 240), Point(20, 120, 260)),
+    vector<Solid*>{
+      new AABB(Point(-20, 80, 240), Point(20, 120, 245), mat_transp_plastic)
+    }
+  );
+  objects.push_back(panel);
+
 
   objects.push_back(table);
 

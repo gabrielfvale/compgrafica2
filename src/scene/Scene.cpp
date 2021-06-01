@@ -219,7 +219,7 @@ void Scene::print(GLubyte* pixels, int samples)
         }
         int total = samples + 1;
         RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
-        set_pixel(pixels, x, y, color);
+        set_pixel(pixels, x, y, final_color);
       }
     }
     },t*resolution/nthreads,(t+1)==nthreads?resolution:(t+1)*resolution/nthreads,t));

@@ -25,9 +25,8 @@ class Material
     void set_ambient(float* rgb);
     void set_diffuse(float* rgb);
     void set_specular(float* rgb);
-    void set_polish(float p);
-    void set_refraction(float r);
-    void set_shine(float s);
+    void set_properties(float* properties);
+    void get_properties(float* properties);
     RGB lambertian(float u, float v, Point& p_int);
 };
 

@@ -51,9 +51,19 @@ void Material::set_specular(float* rgb)
   this->specular.b = rgb[0];
 }
 
-void Material::set_polish(float p) { polish = p; }
-void Material::set_refraction(float r) { refraction = r; }
-void Material::set_shine(float s) { shine = s; }
+void Material::set_properties(float* properties) {
+  this->polish = properties[0];
+  this->refraction = properties[1];
+  this->transmittance = properties[2];
+  this->shine = properties[3];
+}
+
+void Material::get_properties(float* properties) {
+  properties[0] = polish;
+  properties[1] = refraction;
+  properties[2] = transmittance;
+  properties[3] = shine;
+}
 
 RGB Material::lambertian(float u, float v, Point& p_int)
 {

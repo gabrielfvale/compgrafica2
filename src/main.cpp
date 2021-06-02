@@ -216,6 +216,10 @@ Material* mat_table_sup = new Material(
 float obj_ambient[3] = {0.0f, 0.0f, 0.0f};
 float obj_diffuse[3] = {0.0f, 0.0f, 0.0f};
 float obj_specular[3] = {0.0f, 0.0f, 0.0f};
+float obj_properties[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+const int MAT_COUNT = 3; 
+const char* mat_names[MAT_COUNT] = { "DIFFUSE", "REFLECTIVE", "REFLECTIVE AND"};
+static int current_type = DIFFUSE;
 
 float obj_translate[3] = {0.0f, 0.0f, 0.0f};
 float obj_rangle = 0.0f;
@@ -233,7 +237,7 @@ void redraw()
 
 void display_gui()
 {
-  //ImGui::ShowDemoWindow();
+  // ImGui::ShowDemoWindow();
   ImGuiStyle& style = ImGui::GetStyle();
   style.FrameRounding = 12.0f;
   //ImGui::StyleColorsLight();
@@ -255,8 +259,8 @@ void display_gui()
   ImGui::Begin("Scene", NULL, window_flags);
   if(ImGui::BeginTabBar("Main tab bar"))
   {
-    /* Samples */
-    if(ImGui::BeginTabItem("Samples"))
+    /* Projeto */
+    if(ImGui::BeginTabItem("Projecto"))
     {
       if(ImGui::Checkbox("Shadows", &has_shadow))
       {
@@ -389,6 +393,54 @@ void display_gui()
       }
       ImGui::EndTabItem();
     }
+    /* Object picking */
+    if(ImGui::BeginTabItem("Object Picking"))
+    {
+      ImGui::Text(object_name);
+      if(picked_solid != NULL)
+      {
+        if(ImGui::Checkbox("Visible", picked_object->visible_ptr()))
+          redraw();
+        ImGui::ColorEdit3("Ambient", obj_ambient, picker_flags);
+        if(ImGui::IsItemDeactivatedAfterEdit())
+        {
+          Material* material = picked_solid->get_material();
+          material->set_ambient(obj_ambient);
+          redraw();
+        }
+        ImGui::ColorEdit3("Diffuse", obj_diffuse, picker_flags);
+        if(ImGui::IsItemDeactivatedAfterEdit())
+        {
+          Material* material = picked_solid->get_material();
+          material->set_diffuse(obj_diffuse);
+          redraw();
+        }
+        ImGui::ColorEdit3("Specular", obj_specular, picker_flags);
+        if(ImGui::IsItemDeactivatedAfterEdit())
+        {
+          Material* material = picked_solid->get_material();
+          material->set_specular(obj_specular);
+          redraw();
+        }
+        ImGui::Text("Reflection / Refraction / Transmittance / Specular");
+        ImGui::InputFloat4("Properties", obj_properties);
+        if(ImGui::IsItemDeactivatedAfterEdit())
+        {
+          Material* material = picked_solid->get_material();
+          material->set_properties(obj_properties);
+          redraw();
+        }
+        const char* cur_mat_name = (current_type >= 0 && current_type < MAT_COUNT) ? mat_names[current_type] : "Unknown";
+        ImGui::SliderInt("slider enum", &current_type, 0, MAT_COUNT - 1, cur_mat_name);
+        if(ImGui::IsItemDeactivatedAfterEdit())
+        {
+          Material* material = picked_solid->get_material();
+          material->type = (MatType)current_type;
+          redraw();
+        }
+      }
+      ImGui::EndTabItem();
+    }
     if(ImGui::BeginTabItem("Object selection"))
     {
       ImGui::BeginChild("selection", ImVec2(0, 100));
@@ -403,6 +455,38 @@ void display_gui()
   }
   ImGui::End();
 
+  /* Object picking (Ray cast) */
+  ImGuiIO& io = ImGui::GetIO();
+  if(ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered())
+  {
+    // Manda um raio em MousePos.x, MousePos.y
+    Intersection intersection;
+    scene->castRay(io.MousePos.x/upscaling, io.MousePos.y/upscaling, intersection);
+    if(intersection.index != -1)
+    {
+      cout <<  *(intersection.object_hit) << endl;
+      Material* int_material = intersection.solid_hit->get_material();
+
+      obj_ambient[0] = int_material->ambient.r;
+      obj_ambient[1] = int_material->ambient.g;
+      obj_ambient[2] = int_material->ambient.b;
+
+      obj_diffuse[0] = int_material->diffuse.r;
+      obj_diffuse[1] = int_material->diffuse.g;
+      obj_diffuse[2] = int_material->diffuse.b;
+
+      obj_specular[0] = int_material->specular.r;
+      obj_specular[1] = int_material->specular.g;
+      obj_specular[2] = int_material->specular.b;
+
+      int_material->get_properties(obj_properties);
+      current_type = int_material->type;
+
+      object_name = intersection.object_hit->name;
+      picked_solid = intersection.solid_hit;
+      picked_object = intersection.object_hit;
+    }
+  }
 }
 
 void render()

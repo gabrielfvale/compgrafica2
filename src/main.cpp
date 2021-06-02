@@ -260,7 +260,7 @@ void display_gui()
   if(ImGui::BeginTabBar("Main tab bar"))
   {
     /* Projeto */
-    if(ImGui::BeginTabItem("Projecto"))
+    if(ImGui::BeginTabItem("Project"))
     {
       if(ImGui::Checkbox("Shadows", &has_shadow))
       {

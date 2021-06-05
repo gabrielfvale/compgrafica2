@@ -12,6 +12,12 @@ Plane::Plane(Point p0, Vector3 n) : Solid()
   n_ = n;
   n_.normalize();
 }
+Plane::Plane(Point p0, Vector3 n, Material* material) : Solid(material)
+{
+  p0_ = p0;
+  n_ = n;
+  n_.normalize();
+}
 
 Point Plane::get_p0() { return p0_; }
 Vector3 Plane::get_n() { return n_; }

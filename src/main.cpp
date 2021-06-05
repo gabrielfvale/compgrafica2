@@ -29,9 +29,9 @@ bool has_shadow = true;
 GLubyte* PixelBuffer;
 
 /* Origin */
-static float observerf3[3] = { -70.0f, 120.0f, 20.0f };
-static float lookatf3[3] = { 0.0f, 100.0f, 0.0f };
-static float viewupf3[3] = { -70.0f, 121.0f, 20.0f };
+static float observerf3[3] = { -70.0f, 20.0f, 20.0f };
+static float lookatf3[3] = { 0.0f, 0.0f, 0.0f };
+static float viewupf3[3] = { -70.0f, 21.0f, 20.0f };
 
 /* Top 
 static float observerf3[3] = { 0.0f, 280.0f, 20.0f };
@@ -194,6 +194,13 @@ Material* mat_blue_chair = new Material(
   RGB(0.2509, 0.4, 0.4980),
   RGB()
 );
+Material* mat_gray = new Material(
+	RGB(0.5, 0.5, 0.5),
+  RGB(0.5, 0.5, 0.5),
+  RGB(0.5, 0.5, 0.5),
+  {0.1f, 0.0f, 32},
+  REFLECTIVE
+);
 /* Table materials */
 Material* mat_table_top = new Material(
   RGB(0.1921, 0.2588, 0.4274),
@@ -301,7 +308,7 @@ void display_gui()
 
         redraw();
       }
-      /* Point lights */
+      /* Point lights 
       if(ImGui::CollapsingHeader("Point lights"))
       {
         for(unsigned i = 0; i < point_lights.size(); i++)
@@ -331,6 +338,7 @@ void display_gui()
           }
         }
       }
+      */
       /* Remote light */
       if(ImGui::CollapsingHeader("Remote light"))
       {
@@ -582,16 +590,28 @@ int main(int argc, char *argv[])
     )}
   );
 
-  gem->scale(10, 10, 10);
-  gem->translate(Vector3(0, 80, 0));
-  pic_frame->translate(Vector3(-20, 80, 10));
-  btg_bottle->translate(Vector3(-40, 80, 20));
-  globe->translate(Vector3(0, 100, 0));
+  Object* floor = new Object(
+    "Floor",
+    OBB(Point(-3000, 0, -3000), Point(3000, 3000, 3000)),
+    vector<Solid*>{
+      new Plane(
+        Point(0, 0, 0),
+        Vector3(0, 1, 0),
+        mat_gray
+      )
+    }
+  );
 
+  gem->scale(10, 10, 10);
+  gem->translate(Vector3(0, 0, 0));
+  pic_frame->translate(Vector3(-20, 0, 10));
+  btg_bottle->translate(Vector3(-40, 0, 20));
+  globe->translate(Vector3(0, 20, 0));
 
   // objects.push_back(gem);
+  objects.push_back(floor);
   objects.push_back(globe);
-  objects.push_back(table);
+  // objects.push_back(table);
   objects.push_back(pic_frame);
   objects.push_back(btg_bottle);
 

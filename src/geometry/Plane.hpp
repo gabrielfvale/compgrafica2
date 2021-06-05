@@ -11,6 +11,7 @@ class Plane : public Solid
   public:
     Plane();
     Plane(Point p0, Vector3 n);
+    Plane(Point p0, Vector3 n, Material* material);
     Point get_p0();
     Vector3 get_n();
     void set_params(Point* p0, Vector3* n);

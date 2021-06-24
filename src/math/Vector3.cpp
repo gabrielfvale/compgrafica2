@@ -53,6 +53,11 @@ void Vector3::to_float(float* cpy)
   cpy[0] = x_; cpy[1] = y_; cpy[2] = z_;
 }
 
+Point Vector3::to_point()
+{
+  return Point(x_, y_, z_);
+}
+
 float Vector3::norm() { return std::sqrt(dot_product(this)); }
 
 void Vector3::normalize()

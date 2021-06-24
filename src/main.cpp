@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
     )}
   );
   Object* glass_obj = new Object(
-    "GLass",
+    "Glass",
     OBB(Point(-30, -30, -30), Point(30, 30, 30)),
     vector<Solid*>{
       new Sphere(

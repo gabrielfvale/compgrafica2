@@ -30,7 +30,7 @@ void Scene::setShadow(bool value)
   this->shadow = value;
 }
 
-RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
+RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
 {
   Point observer = *(camera->get_eye());
   float t_min = numeric_limits<float>::infinity();
@@ -41,7 +41,7 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
 
   for(unsigned i = 0; i < objects.size(); i++)
   {
-    if((int)i != skip && objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
+    if(objects[i]->trace(ray, obj_intersect) && obj_intersect.tint < t_min)
     {
       t_min = obj_intersect.tint;
       intersection = obj_intersect;
@@ -132,9 +132,9 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth, int skip)
         // calculate refraction if not total internal reflection
         if (kr < 1) {
           bool has_refr;
-          Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction, has_refr);
+          Ray refractionRay = ray.calc_refraction(intersection.p_int, n, solid_mat->refraction);
           Intersection refraction;
-          refraction_color = trace(refractionRay, refraction, depth + 1, intersection.index);
+          refraction_color = trace(refractionRay, refraction, depth + 1);
         }
         // calculate reflection
         Ray reflection_ray = ray.calc_reflection(p_int, n);

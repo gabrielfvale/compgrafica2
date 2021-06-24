@@ -29,11 +29,11 @@ bool has_shadow = true;
 GLubyte* PixelBuffer;
 
 /* Origin */
-static float observerf3[3] = { -70.0f, 20.0f, 20.0f };
-static float lookatf3[3] = { 0.0f, 0.0f, 0.0f };
-static float viewupf3[3] = { -70.0f, 21.0f, 20.0f };
+static float observerf3[3] = { 0.0f, 75.0f, 150.0f };
+static float lookatf3[3] = { 0.0f, 75.0f, 0.0f };
+static float viewupf3[3] = { 0.0f, 76.0f, 150.0f };
 
-/* Top 
+/* Top lights
 static float observerf3[3] = { 0.0f, 280.0f, 20.0f };
 static float lookatf3[3] = { 0.0f, 0.0f, 0.0f };
 static float viewupf3[3] = { 0.0f, 280.0f, 20.0f };
@@ -44,23 +44,23 @@ Camera* camera = new Camera(observerf3, lookatf3, viewupf3);
 /* Lights */
   /* Point lights */
 float pl_intensity[4][3] = {
-  {0.1f, 0.1f, 0.1f},
+  {0.3f, 0.3f, 0.3f},
   {0.1f, 0.1f, 0.1f},
   {0.1f, 0.1f, 0.1f},
   {0.1f, 0.1f, 0.1f}
 };
 float pl_pos[4][3] = {
-  {100, 270, 90},
+  {0, 145, 0},
   {-100, 270, 90},
   {100, 270, 260},
   {-100, 270, 260}
 };
 vector<Light*> point_lights = {
-  new Light(pl_intensity[0], Vector3(pl_pos[0])),
-  new Light(pl_intensity[1], Vector3(pl_pos[1])),
-  new Light(pl_intensity[2], Vector3(pl_pos[2])),
-  new Light(pl_intensity[3], Vector3(pl_pos[3]))
+  new Light(pl_intensity[0], Vector3(pl_pos[0]))
 };
+  // new Light(pl_intensity[1], Vector3(pl_pos[1])),
+  // new Light(pl_intensity[2], Vector3(pl_pos[2])),
+  // new Light(pl_intensity[3], Vector3(pl_pos[3]))
 /* Remote light */
 float rl_intensity[3] = {0.3f, 0.3f, 0.3f};
 float rl_dir[3] = {1, -1, 1};
@@ -78,20 +78,12 @@ Light* ambient_light = new Light(RGB(0.5, 0.5, 0.5), Vector3(), AMBIENT);
 vector<Light*> lights = {
   ambient_light,
   remote_light,
-  spot_light
+  // spot_light
 };
 bool global_switch = true;
 Scene* scene;
 vector<Object*> objects;
 
-/* Materials */
-Material* mat_silver = new Material(
-	RGB(0.23125, 0.23125, 0.23125),
-  RGB(0.2775, 0.2775, 0.2775),
-  RGB(0.773911, 0.773911, 0.773911),
-  {0.05f, 0.0f, 0.f, 89.6},
-  REFLECTIVE
-);
 Material* mat_mirror = new Material(
 	RGB(0.0, 0.0, 0.0),
   RGB(0.0, 0.0, 0.0),
@@ -106,118 +98,20 @@ Material* mat_glass = new Material(
   {1.0f, 1.53f, 0.9f, 38.4},
   REFLECTIVE_AND_REFRACTIVE
 );
-Material* mat_ruby = new Material(
-  RGB(0.1745, 0.01175, 0.01175),
-  RGB(0.61424, 0.04136, 0.04136),
-  RGB(0.727811, 0.626959, 0.626959),
-  {1.0f, 1.53f, 0.9f, 76.8},
-  REFLECTIVE_AND_REFRACTIVE
-);
-Material* mat_white_concrete = new Material(
-  RGB(0.847058, 0.819607, 0.756862),
-  RGB(0.854901, 0.843137, 0.815686),
+Material* mat_white = new Material(
+  RGB(0.9, 0.9, 0.9),
+  RGB(0.9, 0.9, 0.9),
   RGB()
 );
-Material* mat_beige_paint = new Material(
-  RGB(0.819607, 0.776470, 0.698039),
-  RGB(0.882352, 0.839215, 0.760784),
-  RGB(),
-  {0.1f, 0.0f, 0.0f, 0.0f},
-  REFLECTIVE
+Material* mat_red = new Material(
+  RGB(0.7, 0.1, 0.1),
+  RGB(0.8, 0.8, 0.8),
+  RGB(0.1, 0.1, 0.1)
 );
-Material* mat_terrazo = new Material(
-  RGB(0.490196, 0.454901, 0.435294),
-  RGB(0.57254, 0.53725, 0.51764),
-  RGB(0.3, 0.3, 0.3),
-  {0.025f, 0.0f, 0.0f, 38.0},
-  REFLECTIVE
-);
-Material* mat_darkwood = new Material(
-  RGB(0.149019, 0.090196, 0.062745),
-  RGB(0.01, 0.01, 0.01),
-  RGB(0.1, 0.1, 0.1),
-  {0.0f, 0.0f, 0.0f, 38.0}
-);
-Material* mat_old_plastic = new Material(
-  RGB(0.772549, 0.721568, 0.549019),
-  RGB(0.949019, 0.898039, 0.760784),
-  RGB(0.5, 0.5, 0.5),
-  {0.1f, 0.0f, 0.0f, 32},
-  REFLECTIVE
-);
-Material* mat_black_plastic = new Material(
-  RGB(0, 0, 0),
-  RGB(0.01, 0.01, 0.01),
-  RGB(0.5, 0.5, 0.5),
-  {0.0f, 0.0f, 0.0f, 32}
-);
-Material* mat_white_plastic = new Material(
-  RGB(0.933333, 0.925490, 0.878431),
-  RGB(0.976470, 0.968627, 0.921568),
-  RGB(0.5, 0.5, 0.5),
-  {0.1f, 0.0f, 0.0f, 32}
-);
-Material* mat_transp_plastic = new Material(
-  RGB(0.0, 0.0, 0.0),
-  RGB(0.0, 0.0, 0.0),
-  RGB(0.0, 0.0, 0.0),
-  {0.2f, 1.60, 0.9f, 32},
-  REFLECTIVE_AND_REFRACTIVE
-);
-Material* mat_white_lamp = new Material(
-  RGB(1, 1, 1),
-  RGB(1, 1, 1),
-  RGB(1, 1, 1)
-);
-Material* mat_steel = new Material(
-	RGB(0.537354, 0.537354, 0.537354),
-  RGB(0.772549, 0.772549, 0.772549),
-  RGB(0.773911, 0.773911, 0.773911),
-  {0.0f, 0.0f, 0.0f, 32}
-);
-Material* mat_marble = new Material(
-  RGB(0.901960, 0.901960, 0.901960),
-  RGB(0.949019, 0.949019, 0.949019),
-  RGB(0.7, 0.7, 0.7),
-  {0.05f, 0.0f, 0.0f, 89.6},
-  REFLECTIVE
-);
-Material* mat_mdf = new Material(
-  RGB(0.560784, 0.392156, 0.235294),
-  RGB(0.901960, 0.811764, 0.662745),
-  RGB(0.3, 0.3, 0.3),
-  {0.2f, 0.0f, 0.0f, 38},
-  REFLECTIVE
-);
-Material* mat_blue_chair = new Material(
-  RGB(0.1921, 0.2588, 0.4274),
-  RGB(0.2509, 0.4, 0.4980),
-  RGB()
-);
-Material* mat_gray = new Material(
-	RGB(0.5, 0.5, 0.5),
-  RGB(0.5, 0.5, 0.5),
-  RGB(0.5, 0.5, 0.5),
-  {0.1f, 0.0f, 32},
-  REFLECTIVE
-);
-/* Table materials */
-Material* mat_table_top = new Material(
-  RGB(0.1921, 0.2588, 0.4274),
-  RGB(0.2509, 0.4, 0.4980),
-  RGB()
-);
-Material* mat_table_border = new Material(
-  RGB(0.847058, 0.819607, 0.756862),
-  RGB(0.854901, 0.843137, 0.815686),
-  RGB()
-);
-Material* mat_table_sup = new Material(
-	RGB(0.537354, 0.537354, 0.537354),
-  RGB(0.772549, 0.772549, 0.772549),
-  RGB(0.773911, 0.773911, 0.773911),
-  {0.1f, 0.0f, 32},
-  REFLECTIVE
+Material* mat_blue = new Material(
+  RGB(0.1, 0.1, 0.7),
+  RGB(0.8, 0.8, 0.8),
+  RGB(0.1, 0.1, 0.1)
 );
 
 float obj_ambient[3] = {0.0f, 0.0f, 0.0f};
@@ -527,93 +421,49 @@ int main(int argc, char *argv[])
 
   Point origin;
 
-  /*
   for(auto point_light : point_lights)
     lights.push_back(point_light);
-  */
 
-  /* Porta retrato */
-  Object* pic_frame = new Object(
-    "Picture frame",
-    OBB(Point(-1, 0, -6), Point(1, 20, 6)),
-    vector<Solid*>{
-      new AABB(Point(-0.9, 2, -4), Point(0.9, 13, 4), mat_white_plastic), // center
-      new AABB(Point(-1, 0, -6), Point(1, 2, 6), mat_mdf), // bottom
-      new AABB(Point(-1, 13, -6), Point(1, 15, 6), mat_mdf), // top
-      new AABB(Point(-1, 0, -6), Point(1, 15, -4), mat_mdf), // left
-      new AABB(Point(-1, 0, 4), Point(1, 15, 6), mat_mdf), // right
-    }
-  );
-
-  /* Mesa central */
-  Object* table = new Object(
-    "Table",
-    OBB(Point(-60, 0, -60), Point(60, 80, 60)),
-    vector<Solid*>{
-      new AABB(
-        Point(-60, 0, -60),
-        Point(60, 80, 60),
-        mat_mdf
-      )}
-  );
-
-  Object* gem = new Object(
-    "Gem",
-    OBB(Point(-60, 0, -60), Point(60, 80, 60)),
-    vector<Solid*>{}
-  );
-  gem->include("./models/obj/gem.obj", mat_ruby);
-
-  /* Garrafa BTG */
-  Object* btg_bottle = new Object(
-    "BTG Bottle",
-    OBB(Point(-3.5, 0, -3.5), Point(3.5, 22, 3.5)),
-    vector<Solid*>{
-      new Cylinder(Point(), Vector3(), 18.5, 3, mat_transp_plastic),
-      new Cylinder(Point(0, 8, 0), Vector3(), 10.5, 3.2, mat_transp_plastic),
-      new Cylinder(Point(0, 10, 0), Vector3(), 8.5, 3.4, mat_transp_plastic),
-      new Cylinder(Point(0, 12, 0), Vector3(), 6.5, 3.5, mat_transp_plastic),
-      new Cylinder(Point(0, 14, 0), Vector3(), 4.5, 3.5, mat_transp_plastic),
-      new Cylinder(Point(0, 18.5, 0), Vector3(), 0.5, 3, mat_transp_plastic),
-      new Cylinder(Point(0, 19, 0), Vector3(), 3, 3, mat_blue_chair)
-    }
-  );
-
-  Object* globe = new Object(
-    "Globe",
-    OBB(Point(-20, -20, -20), Point(20, 20, 20)),
+  Object* mirror_obj = new Object(
+    "Mirror",
+    OBB(Point(-30, -30, -30), Point(30, 30, 30)),
     vector<Solid*>{
       new Sphere(
       Point(0, 0, 0),
-      20,
+      30,
       mat_mirror
     )}
   );
-
-  Object* floor = new Object(
-    "Floor",
-    OBB(Point(-3000, 0, -3000), Point(3000, 3000, 3000)),
+  Object* glass_obj = new Object(
+    "Glass",
+    OBB(Point(-30, -30, -30), Point(30, 30, 30)),
     vector<Solid*>{
-      new Plane(
-        Point(0, 0, 0),
-        Vector3(0, 1, 0),
-        mat_gray
-      )
+      new Sphere(
+      Point(0, 0, 0),
+      30,
+      mat_glass
+    )}
+  );
+
+  Object* cornell_box = new Object(
+    "Box",
+    OBB(Point(-92, -2, -92), Point(92, 152, 200)),
+    vector<Solid*>{
+      // new Plane(Point(0, 0, 0), Vector3(0, 1, 0), mat_white)
+      new AABB(Point(-90, -2, -75), Point(90, 0, 150), mat_white), // floor
+      new AABB(Point(-90, 150, -75), Point(90, 152, 150), mat_white), // ceiling
+      new AABB(Point(-90, 0, -75), Point(90, 150, -77), mat_white), // back
+      new AABB(Point(-92, 0, -75), Point(-90, 150, 150), mat_red), // right
+      new AABB(Point(90, 0, -75), Point(92, 150, 150), mat_blue), // left
     }
   );
 
-  gem->scale(10, 10, 10);
-  gem->translate(Vector3(0, 0, 0));
-  pic_frame->translate(Vector3(-20, 0, 10));
-  btg_bottle->translate(Vector3(-40, 0, 20));
-  globe->translate(Vector3(0, 20, 0));
+  mirror_obj->translate(Vector3(-40, 30, -20));
+  glass_obj->translate(Vector3(40, 30, 0));
 
-  // objects.push_back(gem);
-  objects.push_back(floor);
-  objects.push_back(globe);
-  // objects.push_back(table);
-  objects.push_back(pic_frame);
-  objects.push_back(btg_bottle);
+  objects.push_back(cornell_box);
+  objects.push_back(mirror_obj);
+  objects.push_back(glass_obj);
 
   scene = new Scene(resolution, camera, objects, lights);
   scene->print(PixelBuffer, samples);

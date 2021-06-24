@@ -40,20 +40,20 @@ Ray Ray::calc_reflection(Point p_int, Vector3 n)
   Vector3 rd = k + v;
   return Ray(p_int, rd);
 }
-Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior, bool& has_refr)
+Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior)
 {
-  has_refr = false;
   Vector3 I = d_;
   Vector3 N = n;
 
   float cosi = I.dot_product(&N);
+  bool outside = cosi < 0;
 
   if (cosi < -1) cosi = -1; 
   if (cosi > 1) cosi = 1; 
 
   float etai = 1, etat = ior; 
 
-  if (cosi < 0) { cosi = -cosi; } else { std::swap(etai, etat); N= N * -1; } 
+  if (outside) { cosi = -cosi; } else { std::swap(etai, etat); N= N * -1; } 
   float eta = etai / etat;
   float k = 1 - eta * eta * (1 - cosi * cosi);
   Vector3 t1 = (I * eta);
@@ -61,9 +61,13 @@ Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior, bool& has_refr)
   Vector3 dir;
   if (k >= 0) {
     dir = t1 + t2;
-    has_refr = true;
   }
-  return Ray(p_int, dir); 
+
+  Vector3 bias = n * 0.001;
+  Point pbias = bias.to_point();
+  Point new_pint = outside ? p_int - pbias : p_int + pbias;
+
+  return Ray(new_pint, dir); 
 }
 
 void Ray::fresnel(Vector3& I, Vector3& N, float& ior, float& kr)

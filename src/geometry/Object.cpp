@@ -116,7 +116,7 @@ bool Object::trace(Ray& ray, Intersection& intersection)
 
   for(unsigned i = 0; i < mesh_.size(); i++)
   {
-    if(mesh_[i]->intersects(ray, t_int) && t_int >= 0 && t_int < t_min)
+    if(mesh_[i]->intersects(ray, t_int) && t_int > 0 && t_int < t_min)
     {
       t_min = t_int;
       intersection.solid_hit = mesh_[i];

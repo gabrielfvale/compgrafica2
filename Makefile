@@ -4,8 +4,8 @@ BUILD_DIR := build
 SRC_DIR := src
 
 CC := g++
-CFLAGS := -std=c++11 -O3 -Wall -g
-LDFLAGS := -lGL -lGLU -lglut -lpthread
+CFLAGS := -std=c++11 -O3 -Wall -g -fopenmp
+LDFLAGS := -lGL -lGLU -lglut -fopenmp
 
 SRC_FILES := $(shell find $(SRC_DIR)/ -name "*.cpp")
 OBJ_FILES := $(SRC_FILES:%=$(BUILD_DIR)/%.o)

@@ -131,7 +131,6 @@ RGB Scene::trace(Ray& ray, Intersection& intersection, int depth)
 
         // calculate refraction if not total internal reflection
         if (kr < 1) {
-          bool has_refr;
           Ray refractionRay = ray.calc_refraction(intersection.p_int, n, solid_mat->refraction);
           Intersection refraction;
           refraction_color = trace(refractionRay, refraction, depth + 1);
@@ -188,49 +187,44 @@ void Scene::print(GLubyte* pixels, int samples)
 
   render_start = chrono::system_clock::now();
 
-  for(size_t t = 0; t < nthreads; t++)
+  std::random_device rd;  //Will be used to obtain a seed for the random number engine
+  std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+
+  RGB out_color;
+
+  #pragma omp parallel for schedule(dynamic, 1) private(out_color)
+  for(int y = 0; y < resolution; y++)
   {
-    threads[t] = thread(bind(
-    [&](const int start_i, const int end_i, const int t)
+    fprintf(stderr,"\rRendering %5.2f%%",100.*y/(resolution-1));
+
+    for (int x = 0; x < resolution; x++)
     {
-    for(int y = start_i; y < end_i; y++)
-    {
-      for (int x = 0; x < resolution; x++)
-      {
-        Intersection intersection;
-        vector<Intersection> intersections;
+      Intersection intersection;
+      vector<Intersection> intersections;
 
-        RGB color = castRay(x, y, intersection, 1.0f);
-        float colors[3] = {color.r, color.g, color.b};
+      RGB color = castRay(x, y, intersection, 1.0f);
+      float colors[3] = {color.r, color.g, color.b};
 
-        std::random_device rd;  //Will be used to obtain a seed for the random number engine
-        std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-        std::uniform_real_distribution<> dis(0.0, 1.0);
-
-        for(int k = 0; k < samples; k++) {
-          float offset = dis(gen);
-          int signal = k % 2 == 0 ? 1  : -1;
-          Intersection newInt;
-          RGB newColor = castRay(x, y, newInt, offset * signal);
-          intersections.push_back(newInt);
-          colors[0] += newColor.r;
-          colors[1] += newColor.g;
-          colors[2] += newColor.b;
-        }
-        int total = samples + 1;
-        RGB final_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
-        set_pixel(pixels, x, y, final_color);
+      for(int k = 0; k < samples; k++) {
+        float offset = dis(gen);
+        int signal = k % 2 == 0 ? 1  : -1;
+        Intersection newInt;
+        RGB newColor = castRay(x, y, newInt, offset * signal);
+        intersections.push_back(newInt);
+        colors[0] += newColor.r;
+        colors[1] += newColor.g;
+        colors[2] += newColor.b;
       }
+      int total = samples + 1;
+      out_color = RGB(colors[0]/total, colors[1]/total, colors[2]/total);
+      set_pixel(pixels, x, y, out_color);
     }
-    },t*resolution/nthreads,(t+1)==nthreads?resolution:(t+1)*resolution/nthreads,t));
   }
-
-  for(size_t i = 0; i < nthreads; i++)
-    threads[i].join();
 
   render_end = chrono::system_clock::now();
   chrono::duration<double> elapsed_seconds = render_end - render_start;
 
-  cout << "[SCENE] Rendered in " << setprecision(2);
-  cout << elapsed_seconds.count() << "s\n"; 
+  std::cout << "\n[SCENE] Rendered in " << setprecision(2);
+  std::cout << elapsed_seconds.count() << "s\n"; 
 }

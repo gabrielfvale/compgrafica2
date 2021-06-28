@@ -36,7 +36,11 @@ class Vector3
     float dot_product(Vector3* v);
     Vector3 cross_product(Vector3* v);
     bool is_orthogonal(Vector3* v);
+    void construct_basis(Vector3& u, Vector3& v);
     friend std::ostream& operator<<(std::ostream& stream, Vector3& vector);
+    static Vector3 sample_hemisphere();
+    static Vector3 sample_sphere();
+    static Vector3 sample_hemisphere_cos();
 };
 
 #endif

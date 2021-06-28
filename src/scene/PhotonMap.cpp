@@ -1,4 +1,5 @@
 #include "PhotonMap.hpp"
+#include <iostream>
 
 PhotonMap::PhotonMap(const int max_phot)
 {
@@ -79,6 +80,8 @@ void PhotonMap::irradiance_estimate(
       irrad[0] += p->power[0];
       irrad[1] += p->power[1];
       irrad[2] += p->power[2];
+      // std::cout << "\nsumming photons" << std::endl;
+      // std::cout << p->power[0] << std::endl;
     }
   }
 

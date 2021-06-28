@@ -163,12 +163,12 @@ void display_gui()
     /* Projeto */
     if(ImGui::BeginTabItem("Project"))
     {
+      ImGui::SliderInt("Samples", &samples, 0, 16);
       if(ImGui::Checkbox("Shadows", &has_shadow))
       {
         scene->setShadow(has_shadow);
         redraw();
       }
-      ImGui::SliderInt("Samples", &samples, 0, 16);
       if(ImGui::Button("Update"))
       {
         redraw();
@@ -202,7 +202,7 @@ void display_gui()
 
         redraw();
       }
-      /* Point lights 
+      /* Point lights */
       if(ImGui::CollapsingHeader("Point lights"))
       {
         for(unsigned i = 0; i < point_lights.size(); i++)
@@ -232,7 +232,6 @@ void display_gui()
           }
         }
       }
-      */
       /* Remote light */
       if(ImGui::CollapsingHeader("Remote light"))
       {

@@ -143,8 +143,66 @@ bool Vector3::is_orthogonal(Vector3* v)
 {
   return dot_product(v) == 0 ? true : false;
 }
+void Vector3::construct_basis(Vector3 &u, Vector3 &v)
+{
+  Vector3 curr = Vector3(x_, y_, z_);
+  Vector3 n = Vector3(1.0, 0.0, 0.0);
+  Vector3 m = Vector3(0.0, 1.0, 0.0);
+  u = curr.cross_product(&n);
+  if (u.norm() < 0.001) {
+    u = curr.cross_product(&m);
+  }
+  v = curr.cross_product(&u);
+}
 std::ostream& operator<<(std::ostream& stream, Vector3& vector)
 {
   stream << "(" << vector.get_x() << ", " << vector.get_y() << ", " << vector.get_z() << ")";
   return stream;
+}
+
+Vector3 Vector3::sample_hemisphere()
+{
+  float u1 = (float)rand()/(float)RAND_MAX;
+  float u2 = (float)rand()/(float)RAND_MAX;
+
+  float x, y, z;
+
+  x = cos(2*M_PI*u2)*2*sqrt(1.0 - u1*u1);
+  y = sin(2*M_PI*u2)*2*sqrt(1.0 - u1*u1);
+  z = u1;
+
+  return Vector3(x, y, z);
+}
+
+Vector3 Vector3::sample_sphere()
+{
+  float u1 = (float)rand()/(float)RAND_MAX;
+  float u2 = (float)rand()/(float)RAND_MAX;
+
+  float x, y, z;
+
+  x = cos(2*M_PI*u2)*2*sqrt(u1*(1.0 - u1));
+  y = sin(2*M_PI*u2)*2*sqrt(u1*(1.0 - u1));
+  z = 1.0 - 2.0*u1;
+
+  return Vector3(x, y, z);
+}
+
+Vector3 Vector3::sample_hemisphere_cos()
+{
+  float u1 = (float)rand()/(float)RAND_MAX;
+  float u2 = (float)rand()/(float)RAND_MAX;
+
+  float th = 2*M_PI*u2;
+  float r = sqrt(u1);
+
+  float x, y, z;
+
+  x = cos(th)*r;
+  y = sin(th)*r;
+  z = 1.0 - x*x - y*y;
+  if (z <= 0.0) z = 0.0;
+  else z = sqrt(z);
+
+  return Vector3(x, y, z);
 }

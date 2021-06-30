@@ -51,19 +51,20 @@ Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior)
   if (cosi < -1) cosi = -1; 
   if (cosi > 1) cosi = 1; 
 
-  float etai = 1, etat = ior; 
+  float etai = 1.0, etat = ior; 
 
   if (outside) {
     cosi = -cosi;
   } else {
-    std::swap(etai, etat);
+    etai = etat;
+    etat = 1.0;
     N = N * -1;
   }
 
   float eta = etai / etat;
   float k = 1 - eta * eta * (1 - cosi * cosi);
   Vector3 t1 = (I * eta);
-  Vector3 t2 = N * (eta * cosi - sqrtf(k));
+  Vector3 t2 = N * (eta * cosi - sqrt(k));
   Vector3 dir;
   if (k >= 0) {
     dir = t1 + t2;
@@ -79,8 +80,8 @@ Ray Ray::calc_refraction(Point p_int, Vector3 n, float ior)
 void Ray::fresnel(Vector3& I, Vector3& N, float& ior, float& kr)
 {
   float cosi = I.dot_product(&N);
-  if (cosi < -1) cosi = -1; 
-  if (cosi > 1) cosi = 1; 
+  if (cosi < -1) cosi = -1;
+  if (cosi > 1) cosi = 1;
 
   float etai = 1.0f, etat = ior;
   if (cosi > 0) std::swap(etai, etat);

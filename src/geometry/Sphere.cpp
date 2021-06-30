@@ -27,7 +27,6 @@ void Sphere::set_params(Point* center, float* radius)
 Vector3 Sphere::surface_normal(Point& p_int)
 {
   Vector3 normal = Vector3(&center_, &p_int);
-  normal = normal/radius_;
   normal.normalize();
   return normal;
 }

@@ -213,7 +213,7 @@ void Scene::print(GLubyte* pixels, int samples)
       dir.normalize();
       Ray randomRay = Ray(pos, dir);
       Point _p = Point();
-      RGB color = RGB(1.0, 1.0, 1.0);
+      RGB color = lights[i]->get_intensity(_p);
       photon_tracing(pmap_global, randomRay, color);
       k++;
     }
@@ -332,12 +332,20 @@ void Scene::photon_tracing(PhotonMap& pmap, Ray& ray, RGB& color, int depth)
   {
     float ior = solid_mat->refraction;
     float d_dot_n = dir.dot_product(&n);
-    float root = 1.0 - (1.0 - (d_dot_n*d_dot_n) / (ior*ior));
+
+    Vector3 nl = n.dot_product(&dir) < 0? n : n*-1;
+		bool into = n.dot_product(&nl) > 0;
+		float nc=1, nt=ior, nnt=into ? nc/nt : nt/nc, ddn=dir.dot_product(&nl), cos2t = 0.0; 
+    Vector3 t1 = dir*nnt;
+    Vector3 t2 = n*((into ? 1 : -1)*(ddn*nnt+sqrt(cos2t)));
+		Vector3 tdir = (t1 - t2); 
+
     // calculate reflection and refraction rays
     Ray reflectionRay = ray.calc_reflection(off_point, n);
-    Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction);
+    // Ray refractionRay = ray.calc_refraction(p_int, n, solid_mat->refraction);
+    Ray refractionRay = Ray(off_point, tdir);
     // check for total internal reflection
-    if (root < 0.0)
+    if ((cos2t=1-nnt*nnt*(1-ddn*ddn)) < 0)
     {
       photon_tracing(pmap, reflectionRay, color, depth + 1);
     }

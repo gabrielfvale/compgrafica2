@@ -443,6 +443,13 @@ int main(int argc, char *argv[])
       mat_glass
     )}
   );
+  // Object* glass_diff = new Object(
+  //   "Glass 2",
+  //   OBB(Point(-30, -30, -30), Point(30, 30, 30)),
+  //   vector<Solid*>{
+  //     new AABB(Point(-30, -30, -30), Point(30, 30, 30), mat_glass)
+  //   }
+  // );
 
   Object* cornell_box = new Object(
     "Box",
